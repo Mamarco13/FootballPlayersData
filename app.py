@@ -5,7 +5,7 @@ from funciones_club import obtener_jugadores_por_club
 
 app = Flask(__name__)
 
-# Diccionario de ligas con códigos y logos
+# Dictionary of leagues with codes and logos
 ligas = {
     0: {"nombre": "LaLiga", "codigo": "ES1", "logo": "https://media.gq.com.mx/photos/647df9eacd18d7f1c032cf77/master/w_1600%2Cc_limit/LaLiga_logo.jpg"},
     1: {"nombre": "LaLiga Hypermotion", "codigo": "ES2", "logo": "https://image.discovery.indazn.com/ca/v2/ca/image?id=fc5ca30c-f166-4a66-b520-b042b4a1d6e5&quality=70"},
@@ -22,19 +22,19 @@ ligas = {
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Obtener los códigos de las ligas seleccionadas desde el formulario
-        ligas_seleccionadas = request.form.getlist('ligas')  # Recibe una lista con los códigos de las ligas
+        # Get selected league codes from the form
+        ligas_seleccionadas = request.form.get('ligas', '').split(',')  # Receives a list of league codes
         jugadores_a_mostrar = int(request.form['jugadores'])
 
-        # Procesar ligas seleccionadas y jugadores
+        # Process selected leagues and players
         ligas_objetos = []
 
         for codigo_liga in ligas_seleccionadas:
             for liga_id, liga_info in ligas.items():
-                if liga_info['codigo'] == codigo_liga:  # Comparar el código de la liga
+                if liga_info['codigo'] == codigo_liga:  # Compare league code
                     nombre = liga_info['nombre']
                     nueva_liga = Liga(codigo_liga, nombre)
-                    # Solo pasamos el código de la liga a la función
+                    # Only pass the league code to the function
                     equipos_nueva_liga = obtener_equipos_por_liga(codigo_liga)
 
                     if equipos_nueva_liga:
@@ -48,8 +48,9 @@ def index():
 
                     ligas_objetos.append(nueva_liga)
 
-        # Obtención de los jugadores
+        # Get players
         top_jugadores = X_jugadores_ligas(ligas_objetos, jugadores_a_mostrar)
+
         jugadores_display = []
         for jugador in top_jugadores:
             jugadores_display.append({
