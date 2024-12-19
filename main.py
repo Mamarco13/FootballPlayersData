@@ -56,7 +56,7 @@ for num in ligas_seleccionadas:
 
 
 # Solicitar al usuario cuántos jugadores mostrar
-jugadores_a_mostrar = input("\nNúmero de jugadores a mostrar en pantalla: ")
+jugadores_a_mostrar = input("\nNumber of players to display on screen: ")
 try:
     jugadores_a_mostrar = int(jugadores_a_mostrar)  # Convertir a entero
     if jugadores_a_mostrar <= 0:
