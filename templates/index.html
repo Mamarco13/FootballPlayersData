@@ -1,169 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Leagues and Players</title>
+    <title>Selección</title>
+    
+    <!-- Estilos internos para mejorar la apariencia -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fa;
-            padding: 20px;
+            font-family: 'Arial', sans-serif; /* Fuente general */
+            background-color: #f4f4f9; /* Fondo de la página */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
+
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 40px;
+            font-size: 36px;
         }
-        .buttons-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-        .league-btn-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 150px;
-        }
-        .league-btn {
-            padding: 0;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0;
-            position: relative;
-            transition: background-color 0.3s ease, border 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 150px;
-            height: 150px;
-            overflow: hidden;
-        }
-        .league-btn:hover {
-            background-color: #0056b3;
-        }
-        .league-btn.selected {
-            background-color: #28a745;
-            border: 4px solid #fff; /* White border when selected */
-            box-shadow: 0 0 15px rgba(40, 167, 69, 0.5); /* Additional highlight with shadow */
-        }
-        .league-btn.selected::after {
-            content: "✔"; /* Check symbol */
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 30px;
-            color: #28a745; /* Green color for the check */
-        }
-        .league-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .league-name {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-        .btn-group {
+
+        p {
             text-align: center;
+            font-size: 18px;
+            color: #666;
         }
-        .form-group select, .form-group input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
+
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
-        .form-group button {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
+
+        button {
+            background-color: #28a745; /* Fondo verde */
+            color: white; /* Color del texto */
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+            padding: 20px 40px; /* Tamaño del botón */
+            margin: 15px; /* Espacio entre los botones */
+            font-size: 20px; /* Tamaño de la fuente */
+            border-radius: 10px; /* Bordes redondeados */
+            cursor: pointer; /* Cambio de cursor a mano */
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Transición para el hover */
         }
-        .form-group button:hover {
-            background-color: #218838;
+
+        button:hover {
+            background-color: #218838; /* Cambio de color al pasar el mouse */
+            transform: scale(1.1); /* Efecto de aumento de tamaño al pasar el mouse */
+        }
+
+        button:focus {
+            outline: none; /* Eliminar borde al hacer clic */
         }
     </style>
 </head>
 <body>
+    <div>
+        <h1>Bienvenido al sistema de selección</h1>
+        <p>Selecciona cómo te gustaría buscar jugadores:</p>
 
-    <div class="container">
-        <h1>Select leagues and the number of players</h1>
+        <!-- Botón para seleccionar ligas -->
+        <form action="/seleccion_liga" method="get">
+            <button type="submit">Seleccionar por Ligas</button>
+        </form>
 
-        <form action="/" method="POST">
-            <div class="buttons-container">
-                <!-- Dynamic generation of league buttons -->
-                {% for liga_id, liga in ligas.items() %}
-                    <div class="league-btn-wrapper">
-                        <button type="button" class="league-btn" id="liga_{{ liga_id }}" data-liga="{{ liga['codigo'] }}">
-                            <img src="{{ liga['logo'] }}" alt="{{ liga['nombre'] }}">
-                        </button>
-                        <div class="league-name">{{ liga['nombre'] }}</div>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <!-- Hidden field to store selected leagues -->
-            <input type="hidden" name="ligas" value="">
-
-            <div class="form-group">
-                <label for="jugadores">Number of players to display:</label>
-                <input type="number" id="jugadores" name="jugadores" value="5" min="1" max="20" required>
-            </div>
-
-            <div class="form-group">
-                <button type="submit">Show Players</button>
-            </div>
+        <!-- Botón para seleccionar clubes -->
+        <form action="/seleccion_club" method="get">
+            <button type="submit">Seleccionar por Clubes</button>
         </form>
     </div>
-
-    <script>
-        // Toggle league selection on button click
-        const ligaButtons = document.querySelectorAll('.league-btn');
-
-        ligaButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                button.classList.toggle('selected'); // Toggle the 'selected' class
-
-                // Update the hidden field value with selected leagues
-                const selectedLigas = Array.from(document.querySelectorAll('.league-btn.selected'))
-                    .map(btn => btn.getAttribute('data-liga')).join(',');
-                const form = button.closest('form');
-                let selectedLigasInput = form.querySelector('input[name="ligas"]');
-                
-                if (!selectedLigasInput) {
-                    selectedLigasInput = document.createElement('input');
-                    selectedLigasInput.setAttribute('type', 'hidden');
-                    selectedLigasInput.setAttribute('name', 'ligas');
-                    form.appendChild(selectedLigasInput);
-                }
-
-                selectedLigasInput.value = selectedLigas;
-
-                // Check the updated value
-                console.log(`Selected leagues: ${selectedLigas}`);
-            });
-        });
-    </script>
-
 </body>
 </html>

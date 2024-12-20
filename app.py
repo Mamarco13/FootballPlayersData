@@ -2,10 +2,12 @@ from flask import Flask, render_template, request
 from classes.liga import Liga
 from funcionesLiga import obtener_equipos_por_liga, X_jugadores_ligas
 from funciones_club import obtener_jugadores_por_club
+from funcionesVisual import convertir_valor_mercado
+from classes.jugador import Jugador
 
 app = Flask(__name__)
 
-# Dictionary of leagues with codes and logos
+# Diccionario de ligas (ya lo tienes)
 ligas = {
     0: {"nombre": "LaLiga", "codigo": "ES1", "logo": "https://media.gq.com.mx/photos/647df9eacd18d7f1c032cf77/master/w_1600%2Cc_limit/LaLiga_logo.jpg"},
     1: {"nombre": "LaLiga Hypermotion", "codigo": "ES2", "logo": "https://image.discovery.indazn.com/ca/v2/ca/image?id=fc5ca30c-f166-4a66-b520-b042b4a1d6e5&quality=70"},
@@ -19,22 +21,30 @@ ligas = {
     9: {"nombre": "Ligue 2", "codigo": "FR2", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5y4ysYOxYZznSIUCw1Fwmg1CT1fADIToFGQ&s"}
 }
 
-@app.route('/', methods=['GET', 'POST'])
+# Diccionario de clubes
+clubes = {
+    0: {"nombre": "Granada CF", "codigo": "16795", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlMlV11fmBvnB7UA6QKpLV7XqT8TpiDjq0fg&s"},
+    1: {"nombre": "Real Madrid", "codigo": "418", "logo": "https://estaticos-cdn.prensaiberica.es/clip/c8717efc-31eb-48fb-b01b-bdd1a43dfde1_alta-libre-aspect-ratio_default_0.jpg"},
+    2: {"nombre": "FC Barcelona", "codigo": "131", "logo": "https://logowik.com/content/uploads/images/802_fcbarcelona.jpg"},
+}
+
+@app.route('/')
 def index():
+    return render_template('index.html', ligas=ligas)
+
+@app.route('/seleccion_liga', methods=['GET', 'POST'])
+def seleccion_liga():
     if request.method == 'POST':
-        # Get selected league codes from the form
-        ligas_seleccionadas = request.form.get('ligas', '').split(',')  # Receives a list of league codes
+        ligas_seleccionadas = request.form.get('ligas', '').split(',')  # Recibe una lista de códigos de ligas
         jugadores_a_mostrar = int(request.form['jugadores'])
 
-        # Process selected leagues and players
         ligas_objetos = []
 
         for codigo_liga in ligas_seleccionadas:
             for liga_id, liga_info in ligas.items():
-                if liga_info['codigo'] == codigo_liga:  # Compare league code
+                if liga_info['codigo'] == codigo_liga:
                     nombre = liga_info['nombre']
                     nueva_liga = Liga(codigo_liga, nombre)
-                    # Only pass the league code to the function
                     equipos_nueva_liga = obtener_equipos_por_liga(codigo_liga)
 
                     if equipos_nueva_liga:
@@ -48,7 +58,6 @@ def index():
 
                     ligas_objetos.append(nueva_liga)
 
-        # Get players
         top_jugadores = X_jugadores_ligas(ligas_objetos, jugadores_a_mostrar)
 
         jugadores_display = []
@@ -62,7 +71,42 @@ def index():
 
         return render_template('jugadores.html', jugadores=jugadores_display)
 
-    return render_template('index.html', ligas=ligas)
+    # Para el método GET
+    return render_template('seleccion_liga.html', ligas=ligas)
+
+
+@app.route('/seleccion_club', methods=['GET', 'POST'])
+def seleccion_club():
+    if request.method == 'POST':
+        clubes_seleccionados = request.form.get('clubes', '').split(',')  # Recibe una lista de códigos de clubes
+        jugadores_a_mostrar = int(request.form['jugadores'])
+
+        clubes_objetos = []
+
+        for codigo_club in clubes_seleccionados:
+            for club_id, club_info in clubes.items():
+                if club_info['codigo'] == codigo_club:
+                    # Obtener jugadores del club
+                    jugadores_insertar = obtener_jugadores_por_club(club_info['codigo'])
+                    for jugador in jugadores_insertar:
+                        club_obj = {'nombre': club_info['nombre'], 'jugador': jugador}
+                        clubes_objetos.append(club_obj)
+
+        # Mostrar jugadores seleccionados
+        jugadores_display = []
+        for club in clubes_objetos:
+            jugadores_display.append({
+                'nombre': club['jugador'].get_nombre(),
+                'equipo': club['nombre'],
+                'valor_mercado': club['jugador'].get_valor_mercado(),
+                'posicion': club['jugador'].get_posicion()
+            })
+
+        return render_template('jugadores.html', jugadores=jugadores_display)
+
+    return render_template('seleccion_club.html', clubes=clubes)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

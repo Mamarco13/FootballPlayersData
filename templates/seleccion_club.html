@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Clubs and Players</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .club-btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 150px;
+        }
+        .club-btn {
+            padding: 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0;
+            position: relative;
+            transition: background-color 0.3s ease, border 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+        }
+        .club-btn:hover {
+            background-color: #0056b3;
+        }
+        .club-btn.selected {
+            background-color: #28a745;
+            border: 4px solid #fff; /* White border when selected */
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.5); /* Additional highlight with shadow */
+        }
+        .club-btn.selected::after {
+            content: "✔"; /* Check symbol */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: #28a745; /* Green color for the check */
+        }
+        .club-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .club-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        .btn-group {
+            text-align: center;
+        }
+        .form-group select, .form-group input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .form-group button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Select clubs and the number of players</h1>
+
+        <form action="/seleccion_club" method="POST">
+            <div class="buttons-container">
+                <!-- Dynamic generation of club buttons -->
+                {% for club_id, club in clubes.items() %}
+                    <div class="club-btn-wrapper">
+                        <button type="button" class="club-btn" id="club_{{ club_id }}" data-club="{{ club['codigo'] }}">
+                            <img src="{{ club['logo'] }}" alt="{{ club['nombre'] }}">
+                        </button>
+                        <div class="club-name">{{ club['nombre'] }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Hidden field to store selected clubs -->
+            <input type="hidden" name="clubes" value="">
+
+            <div class="form-group">
+                <label for="jugadores">Number of players to display:</label>
+                <input type="number" id="jugadores" name="jugadores" value="5" min="1" max="20" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit">Show Players</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Toggle club selection on button click
+        const clubButtons = document.querySelectorAll('.club-btn');
+
+        clubButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('selected'); // Toggle the 'selected' class
+
+                // Update the hidden field value with selected clubs
+                const selectedClubs = Array.from(document.querySelectorAll('.club-btn.selected'))
+                    .map(btn => btn.getAttribute('data-club')).join(',');
+                const form = button.closest('form');
+                let selectedClubsInput = form.querySelector('input[name="clubes"]');
+                
+                if (!selectedClubsInput) {
+                    selectedClubsInput = document.createElement('input');
+                    selectedClubsInput.setAttribute('type', 'hidden');
+                    selectedClubsInput.setAttribute('name', 'clubes');
+                    form.appendChild(selectedClubsInput);
+                }
+
+                selectedClubsInput.value = selectedClubs;
+
+                // Check the updated value
+                console.log(`Selected clubs: ${selectedClubs}`);
+            });
+        });
+    </script>
+
+</body>
+</html>
