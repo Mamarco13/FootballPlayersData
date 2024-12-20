@@ -5,6 +5,15 @@ from funciones_club import obtener_jugadores_por_club
 from funcionesVisual import convertir_valor_mercado
 from classes.jugador import Jugador
 
+from funciones_club import obtener_jugadores_por_club
+from funcionesLiga import X_jugadores_ligas
+from funcionesVisual import convertir_valor_mercado
+from flask import render_template, request
+
+from funciones_club import obtener_jugadores_por_club
+from funcionesVisual import convertir_valor_mercado
+from flask import render_template, request
+
 app = Flask(__name__)
 
 # Diccionario de ligas (ya lo tienes)
@@ -78,32 +87,34 @@ def seleccion_liga():
 @app.route('/seleccion_club', methods=['GET', 'POST'])
 def seleccion_club():
     if request.method == 'POST':
-        clubes_seleccionados = request.form.get('clubes', '').split(',')  # Recibe una lista de códigos de clubes
-        jugadores_a_mostrar = int(request.form['jugadores'])
+        # Obtener los clubes seleccionados desde el formulario
+        clubes_seleccionados = request.form.get('clubes', '').split(',')  # Se espera una lista separada por comas
+        jugadores_a_mostrar = int(request.form['jugadores'])  # Número de jugadores a mostrar
 
-        clubes_objetos = []
-
-        for codigo_club in clubes_seleccionados:
-            for club_id, club_info in clubes.items():
-                if club_info['codigo'] == codigo_club:
-                    # Obtener jugadores del club
-                    jugadores_insertar = obtener_jugadores_por_club(club_info['codigo'])
-                    for jugador in jugadores_insertar:
-                        club_obj = {'nombre': club_info['nombre'], 'jugador': jugador}
-                        clubes_objetos.append(club_obj)
-
-        # Mostrar jugadores seleccionados
         jugadores_display = []
-        for club in clubes_objetos:
-            jugadores_display.append({
-                'nombre': club['jugador'].get_nombre(),
-                'equipo': club['nombre'],
-                'valor_mercado': club['jugador'].get_valor_mercado(),
-                'posicion': club['jugador'].get_posicion()
-            })
 
+        # Obtener los jugadores de todos los clubes seleccionados
+        for codigo_club in clubes_seleccionados:
+            for club_id, club_info in clubes.items():  # Asumiendo que 'clubes' es un diccionario con info de cada club
+                if club_info['codigo'] == codigo_club:
+                    club_objeto = club_info  # Asegúrate de tener toda la información del club
+
+                    # Obtener los jugadores de este club
+                    jugadores = obtener_jugadores_por_club(club_objeto['codigo'])
+
+                    # Añadir los jugadores a la lista
+                    jugadores_display.extend(jugadores)
+
+        # Ordenamos todos los jugadores de todos los clubes seleccionados por valor de mercado
+        jugadores_display.sort(key=lambda x: convertir_valor_mercado(x.get_valor_mercado()), reverse=True)
+
+        # Limitar la lista a los 'X' jugadores más valiosos
+        jugadores_display = jugadores_display[:jugadores_a_mostrar]
+
+        # Renderizamos la plantilla con la lista de jugadores seleccionados y ordenados
         return render_template('jugadores.html', jugadores=jugadores_display)
 
+    # Si el método es GET, simplemente renderizamos la página para seleccionar los clubes
     return render_template('seleccion_club.html', clubes=clubes)
 
 

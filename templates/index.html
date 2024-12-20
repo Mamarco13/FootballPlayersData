@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selección</title>
+    <title>Selection</title>
     
-    <!-- Estilos internos para mejorar la apariencia -->
+    <!-- Internal styles for better appearance -->
     <style>
         body {
-            font-family: 'Arial', sans-serif; /* Fuente general */
-            background-color: #f4f4f9; /* Fondo de la página */
+            font-family: 'Arial', sans-serif; /* General font */
+            background-color: #f4f4f9; /* Page background */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,40 +38,40 @@
         }
 
         button {
-            background-color: #28a745; /* Fondo verde */
-            color: white; /* Color del texto */
+            background-color: #28a745; /* Green background */
+            color: white; /* Text color */
             border: none;
-            padding: 20px 40px; /* Tamaño del botón */
-            margin: 15px; /* Espacio entre los botones */
-            font-size: 20px; /* Tamaño de la fuente */
-            border-radius: 10px; /* Bordes redondeados */
-            cursor: pointer; /* Cambio de cursor a mano */
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Transición para el hover */
+            padding: 20px 40px; /* Button size */
+            margin: 15px; /* Space between buttons */
+            font-size: 20px; /* Font size */
+            border-radius: 10px; /* Rounded corners */
+            cursor: pointer; /* Cursor changes to pointer */
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Transition for hover effect */
         }
 
         button:hover {
-            background-color: #218838; /* Cambio de color al pasar el mouse */
-            transform: scale(1.1); /* Efecto de aumento de tamaño al pasar el mouse */
+            background-color: #218838; /* Color change on hover */
+            transform: scale(1.1); /* Zoom effect on hover */
         }
 
         button:focus {
-            outline: none; /* Eliminar borde al hacer clic */
+            outline: none; /* Remove border on click */
         }
     </style>
 </head>
 <body>
     <div>
-        <h1>Bienvenido al sistema de selección</h1>
-        <p>Selecciona cómo te gustaría buscar jugadores:</p>
+        <h1>Welcome to the Selection System</h1>
+        <p>Select how you would like to search for players:</p>
 
-        <!-- Botón para seleccionar ligas -->
+        <!-- Button to select by leagues -->
         <form action="/seleccion_liga" method="get">
-            <button type="submit">Seleccionar por Ligas</button>
+            <button type="submit">Select by Leagues</button>
         </form>
 
-        <!-- Botón para seleccionar clubes -->
+        <!-- Button to select by clubs -->
         <form action="/seleccion_club" method="get">
-            <button type="submit">Seleccionar por Clubes</button>
+            <button type="submit">Select by Clubs</button>
         </form>
     </div>
 </body>
