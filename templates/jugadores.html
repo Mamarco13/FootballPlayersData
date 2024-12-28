@@ -78,7 +78,7 @@
             <tbody>
                 {% for jugador in jugadores %}
                     <tr>
-                        <td>{{ jugador.nombre }}</td>
+                        <td><a href="/profile/{{ jugador.id }}">{{ jugador.nombre }}</a></td>
                         <td>{{ jugador.equipo }}</td>
                         <td>{{ jugador.valor_mercado }}€</td>
                         <td>{{ jugador.posicion }}</td>

@@ -28,12 +28,18 @@ clubes = {
     2: {"nombre": "FC Barcelona", "codigo": "131", "logo": "https://logowik.com/content/uploads/images/802_fcbarcelona.jpg"},
 }
 
+# Lista global para almacenar jugadores
+todos_los_jugadores = []
+
 @app.route('/')
 def index():
     return render_template('index.html', ligas=ligas)
 
 @app.route('/seleccion_liga', methods=['GET', 'POST'])
 def seleccion_liga():
+    global todos_los_jugadores  # Usar la variable global
+    todos_los_jugadores = []  # Reiniciar cada vez que se hace una nueva selección
+
     if request.method == 'POST':
         ligas_seleccionadas = request.form.get('ligas', '').split(',')  # Recibe una lista de códigos de ligas
         jugadores_a_mostrar = int(request.form['jugadores'])
@@ -50,9 +56,13 @@ def seleccion_liga():
                     if equipos_nueva_liga:
                         for eq in equipos_nueva_liga:
                             jugadores_insertar = obtener_jugadores_por_club(eq.get_id())
+                            print(f"Jugadores a insertar en {eq.get_nombre()}: {len(jugadores_insertar)}")
                             for jugador in jugadores_insertar:
+                                print(f"Agregando jugador con ID: {jugador.get_id()} - {jugador.get_nombre()}")
                                 jugador.set_team(eq)
                                 eq.agregar_jugador(jugador)
+                                todos_los_jugadores.append(jugador)  # Agregar a la lista global
+                            # Agregar a la lista global
                             eq.set_liga(nueva_liga)
                             nueva_liga.agregar_equipo(eq)
 
@@ -63,6 +73,7 @@ def seleccion_liga():
         jugadores_display = []
         for jugador in top_jugadores:
             jugadores_display.append({
+                'id': jugador.get_id(),
                 'nombre': jugador.get_nombre(),
                 'equipo': jugador.get_equipo_actual(),
                 'valor_mercado': jugador.get_valor_mercado(),
@@ -74,8 +85,34 @@ def seleccion_liga():
     # Para el método GET
     return render_template('seleccion_liga.html', ligas=ligas)
 
+@app.route('/profile/<int:jugador_id>')
+def perfil_jugador(jugador_id):
+    jugador_encontrado = None
+    
+    # Verificar qué jugadores están en la lista antes de buscar
+    print("Jugadores disponibles en todos_los_jugadores:")
+    for jugador in todos_los_jugadores:
+        print(f"{jugador.get_id()}: {jugador.get_nombre()}")
+
+    # Buscar el jugador
+    for jugador in todos_los_jugadores:
+        print(f"Buscando jugador con ID {jugador_id}... Ahora mismo comprobando a {jugador.get_nombre()} con ID {jugador.get_id()}")
+        if str(jugador.get_id()) == str(jugador_id):
+            jugador_encontrado = jugador
+            break
+
+    if jugador_encontrado is None:
+        print(f"Jugador con ID {jugador_id} no encontrado.")
+        return render_template('error.html', mensaje="Jugador no encontrado"), 404
+
+    return render_template('profile.html', jugador=jugador_encontrado)
+
+
 @app.route('/seleccion_club', methods=['GET', 'POST'])
 def seleccion_club():
+    global todos_los_jugadores  # Usar la variable global
+    todos_los_jugadores = []  # Reiniciar cada vez que se hace una nueva selección
+
     if request.method == 'POST':
         # Obtener los clubes seleccionados desde el formulario
         clubes_seleccionados = request.form.get('clubes', '').split(',')  # Se espera una lista separada por comas
@@ -94,9 +131,11 @@ def seleccion_club():
 
                     for jugador in jugadores:
                         jugador.set_team_name(club_objeto['nombre'])
+                        todos_los_jugadores.append(jugador)  # Agregar a la lista global
 
                         # Añadir los jugadores a la lista
                         jugadores_display.append({
+                            'id': jugador.get_id(),
                             'nombre': jugador.get_nombre(),
                             'equipo': jugador.get_equipo_actual(),
                             'valor_mercado': jugador.get_valor_mercado(),
@@ -109,6 +148,7 @@ def seleccion_club():
         # Limitar la lista a los 'X' jugadores más valiosos
         jugadores_display = jugadores_display[:jugadores_a_mostrar]
 
+        
         # Renderizamos la plantilla con la lista de jugadores seleccionados y ordenados
         return render_template('jugadores.html', jugadores=jugadores_display)
 
