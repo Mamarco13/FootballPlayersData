@@ -95,6 +95,19 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -120,7 +133,9 @@
 
             <input type="hidden" name="ligas" id="selected-leagues">
 
-            <button type="submit" class="btn btn-primary">Show Players</button>
+            <div class="btn-container">
+                <button type="submit" class="btn">Show Players</button>
+            </div>
         </form>
     </div>
 

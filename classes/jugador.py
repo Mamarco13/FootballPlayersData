@@ -17,6 +17,9 @@ class Jugador:
     def set_team(self, eq):
         self.equipo_actual = eq
 
+    def set_team_name(self, team_name):
+        self.equipo_actual = team_name
+
     # Getters
     def get_id(self):
         """Devuelve el ID del jugador."""

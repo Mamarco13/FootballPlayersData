@@ -5,15 +5,6 @@ from funciones_club import obtener_jugadores_por_club
 from funcionesVisual import convertir_valor_mercado
 from classes.jugador import Jugador
 
-from funciones_club import obtener_jugadores_por_club
-from funcionesLiga import X_jugadores_ligas
-from funcionesVisual import convertir_valor_mercado
-from flask import render_template, request
-
-from funciones_club import obtener_jugadores_por_club
-from funcionesVisual import convertir_valor_mercado
-from flask import render_template, request
-
 app = Flask(__name__)
 
 # Diccionario de ligas (ya lo tienes)
@@ -83,7 +74,6 @@ def seleccion_liga():
     # Para el método GET
     return render_template('seleccion_liga.html', ligas=ligas)
 
-
 @app.route('/seleccion_club', methods=['GET', 'POST'])
 def seleccion_club():
     if request.method == 'POST':
@@ -102,11 +92,19 @@ def seleccion_club():
                     # Obtener los jugadores de este club
                     jugadores = obtener_jugadores_por_club(club_objeto['codigo'])
 
-                    # Añadir los jugadores a la lista
-                    jugadores_display.extend(jugadores)
+                    for jugador in jugadores:
+                        jugador.set_team_name(club_objeto['nombre'])
+
+                        # Añadir los jugadores a la lista
+                        jugadores_display.append({
+                            'nombre': jugador.get_nombre(),
+                            'equipo': jugador.get_equipo_actual(),
+                            'valor_mercado': jugador.get_valor_mercado(),
+                            'posicion': jugador.get_posicion()
+                        })
 
         # Ordenamos todos los jugadores de todos los clubes seleccionados por valor de mercado
-        jugadores_display.sort(key=lambda x: convertir_valor_mercado(x.get_valor_mercado()), reverse=True)
+        jugadores_display.sort(key=lambda x: convertir_valor_mercado(x['valor_mercado']), reverse=True)
 
         # Limitar la lista a los 'X' jugadores más valiosos
         jugadores_display = jugadores_display[:jugadores_a_mostrar]
@@ -116,8 +114,6 @@ def seleccion_club():
 
     # Si el método es GET, simplemente renderizamos la página para seleccionar los clubes
     return render_template('seleccion_club.html', clubes=clubes)
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
