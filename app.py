@@ -77,8 +77,11 @@ def seleccion_liga():
                 'nombre': jugador.get_nombre(),
                 'equipo': jugador.get_equipo_actual(),
                 'valor_mercado': jugador.get_valor_mercado(),
-                'posicion': jugador.get_posicion()
+                'posicion': jugador.get_posicion(),
+                'logros': jugador.get_logros(),
+                'estadisticas': jugador.get_estadisticas()
             })
+
 
         return render_template('jugadores.html', jugadores=jugadores_display)
 
@@ -88,24 +91,57 @@ def seleccion_liga():
 @app.route('/profile/<int:jugador_id>')
 def perfil_jugador(jugador_id):
     jugador_encontrado = None
-    
-    # Verificar qué jugadores están en la lista antes de buscar
-    print("Jugadores disponibles en todos_los_jugadores:")
-    for jugador in todos_los_jugadores:
-        print(f"{jugador.get_id()}: {jugador.get_nombre()}")
 
-    # Buscar el jugador
+    # Buscar el jugador en la lista global
     for jugador in todos_los_jugadores:
-        print(f"Buscando jugador con ID {jugador_id}... Ahora mismo comprobando a {jugador.get_nombre()} con ID {jugador.get_id()}")
         if str(jugador.get_id()) == str(jugador_id):
             jugador_encontrado = jugador
             break
 
     if jugador_encontrado is None:
-        print(f"Jugador con ID {jugador_id} no encontrado.")
         return render_template('error.html', mensaje="Jugador no encontrado"), 404
 
+    # Procesar logros
+    logros_procesados = []
+    for logro in jugador_encontrado.get_logros():
+        detalles = ", ".join(
+            f"{detalle.get('season', {}).get('name', 'Unknown')} - {detalle.get('competition', {}).get('name', detalle.get('club', {}).get('name', 'Unknown'))}"
+            for detalle in logro.get('details', [])
+        )
+        logros_procesados.append(f"{logro['title']} ({logro['count']}) - {detalles}")
+
+    # Procesar estadísticas y filtrar las últimas tres temporadas
+    estadisticas_procesadas = {}
+    stats = jugador_encontrado.get_estadisticas().get('stats', [])
+
+    # Ordenar estadísticas por temporada de forma descendente
+    stats_sorted = sorted(
+        stats,
+        key=lambda stat: stat.get('seasonID', '0'),  # Ordenar por 'seasonID'
+        reverse=True
+    )
+
+    # Limitar a las últimas tres temporadas
+    for stat in stats_sorted[:3]:  # Seleccionar solo las 3 más recientes
+        if isinstance(stat, dict):  # Verificar si es un diccionario
+            key = f"{stat.get('competitionName', 'Unknown')} ({stat.get('seasonID', 'Unknown')})"
+            value = (
+                f"Matches: {stat.get('appearances', '0')}, Goals: {stat.get('goals', '0')}, "
+                f"Assists: {stat.get('assists', '0')}, Minutes: {stat.get('minutesPlayed', '0')}"
+            )
+            estadisticas_procesadas[key] = value
+        elif isinstance(stat, str):  # Si ya es una cadena
+            estadisticas_procesadas[stat] = "No additional data available"
+        else:  # Caso inesperado
+            print(f"Formato inesperado en estadística: {stat}")
+            estadisticas_procesadas["Unknown"] = "Formato desconocido"
+
+    # Actualizar los datos del jugador
+    jugador_encontrado.logros = logros_procesados
+    jugador_encontrado.estadisticas = estadisticas_procesadas
+
     return render_template('profile.html', jugador=jugador_encontrado)
+
 
 
 @app.route('/seleccion_club', methods=['GET', 'POST'])
@@ -139,8 +175,11 @@ def seleccion_club():
                             'nombre': jugador.get_nombre(),
                             'equipo': jugador.get_equipo_actual(),
                             'valor_mercado': jugador.get_valor_mercado(),
-                            'posicion': jugador.get_posicion()
+                            'posicion': jugador.get_posicion(),
+                            'logros': jugador.get_logros(),
+                            'estadisticas': jugador.get_estadisticas()
                         })
+
 
         # Ordenamos todos los jugadores de todos los clubes seleccionados por valor de mercado
         jugadores_display.sort(key=lambda x: convertir_valor_mercado(x['valor_mercado']), reverse=True)

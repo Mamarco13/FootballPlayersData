@@ -41,7 +41,13 @@
         <h1>{{ jugador.get_nombre() }}</h1>
         <p><strong>Position:</strong> {{ jugador.get_posicion() }}</p>
         <p><strong>Age:</strong> {{ jugador.get_edad() }}</p>
-        <p><strong>Nationality:</strong> {{ jugador.get_nacionalidad() }}</p>
+        <p><strong>Nationality:</strong> {% if jugador.get_nacionalidad() %}
+            {{ jugador.get_nacionalidad() | join(", ") }}
+            {% else %}
+            No nationality specified.
+            {% endif %}
+        </p>
+        
         <p><strong>Market Value:</strong> {{ jugador.get_valor_mercado() }}€</p>
         <p><strong>Current Team:</strong> {{ jugador.get_equipo_actual() }}</p>
         
@@ -53,28 +59,6 @@
                 {% endfor %}
             {% else %}
                 <li>No achievements recorded.</li>
-            {% endif %}
-        </ul>
-        
-        <h2>Transfers</h2>
-        <ul>
-            {% if jugador.get_transferencias() %}
-                {% for transferencia in jugador.get_transferencias() %}
-                    <li>{{ transferencia }}</li>
-                {% endfor %}
-            {% else %}
-                <li>No transfers recorded.</li>
-            {% endif %}
-        </ul>
-        
-        <h2>Injuries</h2>
-        <ul>
-            {% if jugador.get_lesiones() %}
-                {% for lesion in jugador.get_lesiones() %}
-                    <li>{{ lesion }}</li>
-                {% endfor %}
-            {% else %}
-                <li>No injuries recorded.</li>
             {% endif %}
         </ul>
 
