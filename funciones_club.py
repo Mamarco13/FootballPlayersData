@@ -16,19 +16,47 @@ def obtener_logros(jugador_id):
         print(f"Error al obtener logros para jugador {jugador_id}: {e}")
         return []
 
-# Función para obtener las estadísticas de un jugador
 def obtener_estadisticas(jugador_id):
     try:
         response_estadisticas = requests.get(f"http://127.0.0.1:8000/players/{jugador_id}/stats")
         if response_estadisticas.status_code == 200:
             estadisticas_completas = response_estadisticas.json().get('stats', [])
-            return {"stats": estadisticas_completas[:3]}
+            
+            # Ordenar las estadísticas por temporada (de más reciente a más antigua)
+            estadisticas_sorted = sorted(
+                estadisticas_completas,
+                key=lambda stat: stat.get('seasonID', '0'),  # Ordenar por 'seasonID'
+                reverse=True
+            )
+            
+            # Crear un diccionario para agrupar las competiciones por temporada
+            temporadas_incluidas = {}
+            for stat in estadisticas_sorted:
+                temporada = stat.get('seasonID')
+                
+                # Solo añadir las tres últimas temporadas (sin romper el ciclo)
+                if temporada not in temporadas_incluidas and len(temporadas_incluidas) < 2:
+                    temporadas_incluidas[temporada] = []
+                
+                # Añadir todas las competiciones de la temporada
+                if temporada in temporadas_incluidas:
+                    temporadas_incluidas[temporada].append(stat)
+
+            # Convertir el diccionario a una lista de estadísticas
+            stats_finales = []
+            for temporada, stats in temporadas_incluidas.items():
+                stats_finales.extend(stats)
+            
+            return {"stats": stats_finales}
         else:
             print(f"Estadísticas no encontradas para jugador {jugador_id}")
             return {}
     except requests.exceptions.RequestException as e:
         print(f"Error al obtener estadísticas para jugador {jugador_id}: {e}")
         return {}
+
+
+
 
 # Función principal para obtener los jugadores de un club
 def obtener_jugadores_por_club(club_id):

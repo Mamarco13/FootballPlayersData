@@ -121,20 +121,32 @@ def perfil_jugador(jugador_id):
         reverse=True
     )
 
-    # Limitar a las últimas tres temporadas
-    for stat in stats_sorted[:3]:  # Seleccionar solo las 3 más recientes
-        if isinstance(stat, dict):  # Verificar si es un diccionario
-            key = f"{stat.get('competitionName', 'Unknown')} ({stat.get('seasonID', 'Unknown')})"
-            value = (
-                f"Matches: {stat.get('appearances', '0')}, Goals: {stat.get('goals', '0')}, "
-                f"Assists: {stat.get('assists', '0')}, Minutes: {stat.get('minutesPlayed', '0')}"
-            )
-            estadisticas_procesadas[key] = value
-        elif isinstance(stat, str):  # Si ya es una cadena
-            estadisticas_procesadas[stat] = "No additional data available"
-        else:  # Caso inesperado
-            print(f"Formato inesperado en estadística: {stat}")
-            estadisticas_procesadas["Unknown"] = "Formato desconocido"
+    # Agrupar las competiciones por temporada
+    temporadas_incluidas = {}
+    for stat in stats_sorted:
+        temporada = stat.get('seasonID')
+        if len(temporadas_incluidas) < 3:  # Limitar a las tres últimas temporadas
+            if temporada not in temporadas_incluidas:
+                temporadas_incluidas[temporada] = []
+            # Agregar la competencia de la temporada actual
+            temporadas_incluidas[temporada].append(stat)
+
+    # Procesar estadísticas para mostrar todas las competiciones de las tres últimas temporadas
+    for temporada, stats_por_temporada in temporadas_incluidas.items():
+        for stat in stats_por_temporada:
+            if isinstance(stat, dict):  # Verificar si es un diccionario
+                key = f"{stat.get('competitionName', 'Unknown')} ({stat.get('seasonID', 'Unknown')})"
+                value = (
+                    f"Matches: {stat.get('appearances', '0')}, Goals: {stat.get('goals', '0')}, "
+                    f"Assists: {stat.get('assists', '0')}, Minutes: {stat.get('minutesPlayed', '0')}"
+                )
+                estadisticas_procesadas[key] = value
+            elif isinstance(stat, str):  # Si ya es una cadena
+                estadisticas_procesadas[stat] = "No additional data available"
+            else:  # Caso inesperado
+                print(f"Formato inesperado en estadística: {stat}")
+                estadisticas_procesadas["Unknown"] = "Formato desconocido"
+
 
     # Actualizar los datos del jugador
     jugador_encontrado.logros = logros_procesados
