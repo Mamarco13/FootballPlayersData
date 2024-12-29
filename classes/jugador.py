@@ -1,7 +1,7 @@
 class Jugador:
     def __init__(self, id, nombre, posicion, edad, nacionalidad, valor_mercado=None, 
                  equipo_actual=None, logros=None,
-                 estadisticas=None):
+                 estadisticas=None, imagen=None):
         self.id = id
         self.nombre = nombre
         self.posicion = posicion
@@ -11,6 +11,7 @@ class Jugador:
         self.equipo_actual = equipo_actual
         self.logros = logros or []
         self.estadisticas = estadisticas or {}
+        self.imagen = imagen
 
     def set_team(self, eq):
         self.equipo_actual = eq
@@ -54,6 +55,7 @@ class Jugador:
     def get_estadisticas(self):
         """Devuelve el diccionario de estadísticas del jugador."""
         return self.estadisticas
+        
 
     def __str__(self):
         return f"{self.nombre} ({self.posicion}, {self.equipo_actual}) - {self.valor_mercado}€"

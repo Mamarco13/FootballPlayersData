@@ -34,6 +34,11 @@
         ul li {
             list-style-type: disc;
         }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -72,6 +77,12 @@
                 <li>No statistics available.</li>
             {% endif %}
         </ul>
+
+        <!-- Mostrar el gráfico generado (si existe) -->
+        {% if imagen_base64 %}
+            <h3>Player Statistics Graph</h3>
+            <img src="data:image/png;base64,{{ imagen_base64 }}" alt="Statistics Graph">
+        {% endif %}
 
         <a href="/" style="color: #28a745; text-decoration: none;">Back to Home</a>
     </div>

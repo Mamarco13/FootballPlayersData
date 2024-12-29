@@ -94,7 +94,7 @@ def obtener_jugadores_por_club(club_id):
                 jugador_objeto.estadisticas = estadisticas_future.result()
 
                 # Debug
-                print(f"Jugador agregado: {jugador_objeto.get_nombre()},  {jugador_objeto.get_logros()}, {jugador_objeto.get_estadisticas()}\n")
+                print(f"Jugador agregado: {jugador_objeto.get_nombre()},{jugador_objeto.get_estadisticas()}\n")
 
                 jugadores_objetos.append(jugador_objeto)
 

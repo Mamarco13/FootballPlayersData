@@ -4,6 +4,10 @@ from funcionesLiga import obtener_equipos_por_liga, X_jugadores_ligas
 from funciones_club import obtener_jugadores_por_club
 from funcionesVisual import convertir_valor_mercado
 from classes.jugador import Jugador
+from flask import render_template
+from funcionesJugadores import mostrar_estadisticas_grafico  # Importa la función de grafico.py
+import requests
+
 
 app = Flask(__name__)
 
@@ -147,12 +151,17 @@ def perfil_jugador(jugador_id):
                 print(f"Formato inesperado en estadística: {stat}")
                 estadisticas_procesadas["Unknown"] = "Formato desconocido"
 
+    # Generar el gráfico de estadísticas en base64
+    imagen_base64 = mostrar_estadisticas_grafico(jugador_encontrado.get_estadisticas())
 
     # Actualizar los datos del jugador
     jugador_encontrado.logros = logros_procesados
     jugador_encontrado.estadisticas = estadisticas_procesadas
+    jugador_encontrado.imagen_base64 = imagen_base64  # Agregar la imagen codificada en base64
 
-    return render_template('profile.html', jugador=jugador_encontrado)
+    # Renderizar la plantilla y pasar la imagen
+    return render_template('profile.html', jugador=jugador_encontrado, imagen_base64=imagen_base64)
+
 
 
 
