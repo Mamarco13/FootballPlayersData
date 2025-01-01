@@ -56,6 +56,29 @@ def obtener_estadisticas(jugador_id):
         return {}
 
 
+# Función principal para obtener los jugadores de un club
+def obtener_jugadores_por_club_simple(club_id):
+    url = f"http://127.0.0.1:8000/clubs/{club_id}/players"
+    try:
+        respuesta = requests.get(url)
+        respuesta.raise_for_status()
+        jugadores = respuesta.json()
+        jugadores_objetos = []
+
+        for jugador in jugadores['players']:
+                jugador_objeto = Jugador(
+                    id=jugador['id'],
+                    nombre=jugador['name'],
+                    posicion=jugador.get('position', 'No disponible'),
+                    valor_mercado=jugador.get('marketValue', 'No disponible')
+                )
+
+                jugadores_objetos.append(jugador_objeto)
+
+        return jugadores_objetos
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener jugadores del club {club_id}: {e}")
+        return []
 
 
 # Función principal para obtener los jugadores de un club
@@ -92,9 +115,6 @@ def obtener_jugadores_por_club(club_id):
             for jugador_objeto, logros_future, estadisticas_future in futures:
                 jugador_objeto.logros = logros_future.result()
                 jugador_objeto.estadisticas = estadisticas_future.result()
-
-                # Debug
-                print(f"Jugador agregado: {jugador_objeto.get_nombre()},{jugador_objeto.get_estadisticas()}\n")
 
                 jugadores_objetos.append(jugador_objeto)
 

@@ -7,71 +7,87 @@ import matplotlib.pyplot as plt
 
 
 def mostrar_estadisticas_grafico(estadisticas):
-    # Convertir las estadísticas a un DataFrame de pandas
-    stats = estadisticas.get("stats", [])
-    
+    if isinstance(estadisticas, list):
+        stats = estadisticas
+    elif isinstance(estadisticas, dict):
+        stats = estadisticas.get("stats", [])
+    else:
+        print("Formato de estadísticas no reconocido.")
+        return None
+
     if not stats:
         print("No hay estadísticas para mostrar.")
         return None
-    
-    # Crear un DataFrame a partir de las estadísticas
+
+    # Convertir a DataFrame
     df = pd.DataFrame(stats)
-    
-    # Asegurarse de que las columnas necesarias están presentes
-    if 'competitionName' not in df.columns or 'seasonID' not in df.columns:
+
+    required_columns = {'competitionName', 'seasonID', 'goals', 'assists', 'appearances', 'minutesPlayed'}
+    if not required_columns.issubset(df.columns):
         print("Faltan datos necesarios para generar el gráfico.")
         return None
 
-    # Convertir columnas numéricas a su tipo adecuado (int o float)
+    # Convertir columnas a tipos adecuados
     df['goals'] = pd.to_numeric(df['goals'], errors='coerce').fillna(0).astype(int)
     df['assists'] = pd.to_numeric(df['assists'], errors='coerce').fillna(0).astype(int)
     df['appearances'] = pd.to_numeric(df['appearances'], errors='coerce').fillna(0).astype(int)
     df['minutesPlayed'] = pd.to_numeric(df['minutesPlayed'], errors='coerce').fillna(0).astype(int)
-
-    # Asegurarse de que las columnas estén en formato correcto (str)
     df['competitionName'] = df['competitionName'].astype(str)
     df['seasonID'] = df['seasonID'].astype(str)
-    
-    # Crear un gráfico de barras para cada tipo de estadística (goles, asistencias, etc.)
+
+    # Filtrar estadísticas por las dos temporadas más recientes
+    temporadas_mas_recientes = df['seasonID'].drop_duplicates().sort_values(ascending=False).head(2)
+    df = df[df['seasonID'].isin(temporadas_mas_recientes)]
+
+    if df.empty:
+        print("No hay estadísticas para las últimas dos temporadas.")
+        return None
+
+    # Crear gráficos
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
+    # Etiquetas combinadas
+    df['competition_season'] = df['competitionName'] + " (" + df['seasonID'] + ")"
+
     # Gráfico de Goles
-    axes[0, 0].bar(df['competitionName'] + " (" + df['seasonID'] + ")", df['goals'], color='skyblue')
-    axes[0, 0].set_title('Goals per Competition')
+    axes[0, 0].bar(df['competition_season'], df['goals'], color='skyblue')
+    axes[0, 0].set_title('Goals - Last 2 Seasons')
     axes[0, 0].set_ylabel('Goals')
-    axes[0, 0].tick_params(axis='x', rotation=45)
+    axes[0, 0].tick_params(axis='x', rotation=45, labelsize=10)
 
     # Gráfico de Asistencias
-    axes[0, 1].bar(df['competitionName'] + " (" + df['seasonID'] + ")", df['assists'], color='lightgreen')
-    axes[0, 1].set_title('Assists per Competition')
+    axes[0, 1].bar(df['competition_season'], df['assists'], color='lightgreen')
+    axes[0, 1].set_title('Assists - Last 2 Seasons')
     axes[0, 1].set_ylabel('Assists')
-    axes[0, 1].tick_params(axis='x', rotation=45)
+    axes[0, 1].tick_params(axis='x', rotation=45, labelsize=10)
 
     # Gráfico de Apariciones
-    axes[1, 0].bar(df['competitionName'] + " (" + df['seasonID'] + ")", df['appearances'], color='coral')
-    axes[1, 0].set_title('Appearances per Competition')
+    axes[1, 0].bar(df['competition_season'], df['appearances'], color='coral')
+    axes[1, 0].set_title('Appearances - Last 2 Seasons')
     axes[1, 0].set_ylabel('Appearances')
-    axes[1, 0].tick_params(axis='x', rotation=45)
+    axes[1, 0].tick_params(axis='x', rotation=45, labelsize=10)
 
     # Gráfico de Minutos Jugados
-    axes[1, 1].bar(df['competitionName'] + " (" + df['seasonID'] + ")", df['minutesPlayed'], color='lightcoral')
-    axes[1, 1].set_title('Minutes Played per Competition')
+    axes[1, 1].bar(df['competition_season'], df['minutesPlayed'], color='lightcoral')
+    axes[1, 1].set_title('Minutes Played - Last 2 Seasons')
     axes[1, 1].set_ylabel('Minutes Played')
-    axes[1, 1].tick_params(axis='x', rotation=45)
+    axes[1, 1].tick_params(axis='x', rotation=45, labelsize=10)
 
-    # Ajustar espacio entre los subgráficos
+    # Ajustar espacio entre gráficos
     plt.tight_layout()
-    
-    # Guardar el gráfico en memoria como una imagen en formato PNG
-    img_stream = io.BytesIO()
-    plt.savefig(img_stream, format='png')
-    plt.close()  # Cerrar el gráfico
 
-    # Convertir la imagen a base64
-    img_stream.seek(0)  # Volver al principio del stream
+    # Guardar el gráfico en memoria como PNG
+    img_stream = io.BytesIO()
+    plt.savefig(img_stream, format='png', dpi=100)
+    plt.close()
+
+    img_stream.seek(0)
     img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
     
     return img_base64
+
+
+
 
 
 def obtener_valor_mercado(player_id: str):
@@ -99,4 +115,46 @@ def convertir_valor_mercado(valor_mercado):
         return float(valor_mercado)  # Para valores numéricos directos
 
 
+def completar_jugador(jugador):
+    """
+    Completa un objeto Jugador con su Nacionalidad, Edad, Logros y Estadísticas.
+    """
+    jugador_id = jugador.get_id()
+    
+    try:
+        # Obtener perfil del jugador (incluye edad y nacionalidad)
+        profile_url = f"http://127.0.0.1:8000/players/{jugador_id}/profile"
+        response_profile = requests.get(profile_url)
+        if response_profile.status_code == 200:
+            profile_data = response_profile.json()
+            jugador.nacionalidad = profile_data.get("nationality")
+            jugador.edad = profile_data.get("age")
+        else:
+            print(f"No se pudo obtener el perfil del jugador {jugador_id}")
 
+        # Obtener logros del jugador
+        achievements_url = f"http://127.0.0.1:8000/players/{jugador_id}/achievements"
+        response_achievements = requests.get(achievements_url)
+        if response_achievements.status_code == 200:
+            achievements_data = response_achievements.json().get('achievements', [])
+            jugador.logros = achievements_data
+        else:
+            print(f"No se pudieron obtener los logros del jugador {jugador_id}")
+
+        # Obtener estadísticas del jugador
+        stats_url = f"http://127.0.0.1:8000/players/{jugador_id}/stats"
+        response_stats = requests.get(stats_url)
+        if response_stats.status_code == 200:
+            stats_data = response_stats.json().get('stats', [])
+            if isinstance(stats_data, list):
+                jugador.estadisticas = stats_data
+            else:
+                jugador.estadisticas = [stats_data]  # Asegurar que siempre sea lista
+        else:
+            print(f"No se pudieron obtener las estadísticas del jugador {jugador_id}")
+
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error al completar datos del jugador {jugador_id}: {e}")
+    
+    return jugador

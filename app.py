@@ -1,12 +1,10 @@
 from flask import Flask, render_template, request
 from classes.liga import Liga
 from funcionesLiga import obtener_equipos_por_liga, X_jugadores_ligas
-from funciones_club import obtener_jugadores_por_club
+from funciones_club import obtener_jugadores_por_club, obtener_jugadores_por_club_simple
 from funcionesVisual import convertir_valor_mercado
-from classes.jugador import Jugador
 from flask import render_template
-from funcionesJugadores import mostrar_estadisticas_grafico  # Importa la función de grafico.py
-import requests
+from funcionesJugadores import mostrar_estadisticas_grafico, completar_jugador  # Importa la función de grafico.py
 
 
 app = Flask(__name__)
@@ -59,10 +57,8 @@ def seleccion_liga():
 
                     if equipos_nueva_liga:
                         for eq in equipos_nueva_liga:
-                            jugadores_insertar = obtener_jugadores_por_club(eq.get_id())
-                            print(f"Jugadores a insertar en {eq.get_nombre()}: {len(jugadores_insertar)}")
+                            jugadores_insertar = obtener_jugadores_por_club_simple(eq.get_id())
                             for jugador in jugadores_insertar:
-                                print(f"Agregando jugador con ID: {jugador.get_id()} - {jugador.get_nombre()}")
                                 jugador.set_team(eq)
                                 eq.agregar_jugador(jugador)
                                 todos_los_jugadores.append(jugador)  # Agregar a la lista global
@@ -99,7 +95,13 @@ def perfil_jugador(jugador_id):
     # Buscar el jugador en la lista global
     for jugador in todos_los_jugadores:
         if str(jugador.get_id()) == str(jugador_id):
-            jugador_encontrado = jugador
+            #jugador_encontrado = jugador
+
+            #COMPLETAR JUGADOR MEJOR QUE LO DE ARRIBA
+            jugador_encontrado = completar_jugador(jugador)
+
+
+
             break
 
     if jugador_encontrado is None:
@@ -116,7 +118,7 @@ def perfil_jugador(jugador_id):
 
     # Procesar estadísticas y filtrar las últimas tres temporadas
     estadisticas_procesadas = {}
-    stats = jugador_encontrado.get_estadisticas().get('stats', [])
+    stats = jugador_encontrado.get_estadisticas()#.get('stats', [])
 
     # Ordenar estadísticas por temporada de forma descendente
     stats_sorted = sorted(
@@ -127,15 +129,20 @@ def perfil_jugador(jugador_id):
 
     # Agrupar las competiciones por temporada
     temporadas_incluidas = {}
+    contador_temporadas = 0  # Contador de temporadas distintas
+
     for stat in stats_sorted:
         temporada = stat.get('seasonID')
-        if len(temporadas_incluidas) < 3:  # Limitar a las tres últimas temporadas
-            if temporada not in temporadas_incluidas:
+        if temporada not in temporadas_incluidas:
+            if contador_temporadas < 2:  # Limitar a las dos últimas temporadas
                 temporadas_incluidas[temporada] = []
-            # Agregar la competencia de la temporada actual
+                contador_temporadas += 1
+
+        # Agregar la competencia de la temporada actual si la temporada ya está incluida
+        if temporada in temporadas_incluidas:
             temporadas_incluidas[temporada].append(stat)
 
-    # Procesar estadísticas para mostrar todas las competiciones de las tres últimas temporadas
+    # Procesar estadísticas para mostrar todas las competiciones de las dos últimas temporadas
     for temporada, stats_por_temporada in temporadas_incluidas.items():
         for stat in stats_por_temporada:
             if isinstance(stat, dict):  # Verificar si es un diccionario
@@ -150,6 +157,7 @@ def perfil_jugador(jugador_id):
             else:  # Caso inesperado
                 print(f"Formato inesperado en estadística: {stat}")
                 estadisticas_procesadas["Unknown"] = "Formato desconocido"
+
 
     # Generar el gráfico de estadísticas en base64
     imagen_base64 = mostrar_estadisticas_grafico(jugador_encontrado.get_estadisticas())

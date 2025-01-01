@@ -1,5 +1,5 @@
 class Jugador:
-    def __init__(self, id, nombre, posicion, edad, nacionalidad, valor_mercado=None, 
+    def __init__(self, id, nombre, posicion, edad=None, nacionalidad=None, valor_mercado=None, 
                  equipo_actual=None, logros=None,
                  estadisticas=None, imagen=None):
         self.id = id
