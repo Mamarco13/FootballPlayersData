@@ -7,6 +7,24 @@ import matplotlib
 #matplotlib.use('Agg')  # Usar un backend no interactivo para evitar errores de GUI
 import matplotlib.ticker as mticker
 
+def abreviar_competicion(nombre):
+    # Diccionario de abreviaturas para competiciones conocidas
+    abreviaturas = {
+        "Premier League": "PL",
+        "Champions League": "UCL",
+        "Europa League": "UEL",
+        "LaLiga": "LL",
+        "LaLiga2": "LL2",
+        "Serie A": "SA",
+        "Bundesliga": "BUN",
+        "Ligue 1": "L1",
+    }
+    # Usar la abreviatura del diccionario si está definida
+    if nombre in abreviaturas:
+        return abreviaturas[nombre]
+    # Si no, generar una abreviatura automática tomando la primera letra de cada palabra
+    return ''.join([palabra[0].upper() for palabra in nombre.split()])
+
 def mostrar_estadisticas_grafico(estadisticas):
     # Validar el formato de entrada
     if isinstance(estadisticas, list):
@@ -48,6 +66,7 @@ def mostrar_estadisticas_grafico(estadisticas):
         return None
 
     # Crear columna combinada para etiquetas
+    df['competitionName'] = df['competitionName'].apply(abreviar_competicion)
     df['competition_season'] = df['competitionName'] + " (" + df['seasonID'] + ")"
 
     # Crear gráficos con Pandas
@@ -57,21 +76,25 @@ def mostrar_estadisticas_grafico(estadisticas):
     df.plot.bar(x='competition_season', y='goals', color='skyblue', ax=axes[0, 0], legend=False)
     axes[0, 0].set_title('Goals - Last 2 Seasons')
     axes[0, 0].set_ylabel('Goals')
+    axes[0, 0].tick_params(axis='x', labelrotation=45)
 
     # Gráfico de Asistencias
     df.plot.bar(x='competition_season', y='assists', color='lightgreen', ax=axes[0, 1], legend=False)
     axes[0, 1].set_title('Assists - Last 2 Seasons')
     axes[0, 1].set_ylabel('Assists')
+    axes[0, 1].tick_params(axis='x', labelrotation=45)
 
     # Gráfico de Apariciones
     df.plot.bar(x='competition_season', y='appearances', color='coral', ax=axes[1, 0], legend=False)
     axes[1, 0].set_title('Appearances - Last 2 Seasons')
     axes[1, 0].set_ylabel('Appearances')
+    axes[1, 0].tick_params(axis='x', labelrotation=45)
 
     # Gráfico de Minutos Jugados
     df.plot.bar(x='competition_season', y='minutesPlayed', color='lightcoral', ax=axes[1, 1], legend=False)
     axes[1, 1].set_title('Minutes Played - Last 2 Seasons')
     axes[1, 1].set_ylabel('Minutes Played')
+    axes[1, 1].tick_params(axis='x', labelrotation=45)
 
     # Ajustar el límite superior del eje Y para minutos jugados
     ylim_upper = df['minutesPlayed'].max() * 1.2
@@ -81,9 +104,6 @@ def mostrar_estadisticas_grafico(estadisticas):
     axes[1, 1].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
 
     # Ajustar diseño y guardar el gráfico
-    for ax in axes.flatten():
-        ax.tick_params(axis='x', rotation=45, labelsize=10)
-
     plt.tight_layout()
 
     # Guardar el gráfico en memoria como PNG
@@ -95,6 +115,7 @@ def mostrar_estadisticas_grafico(estadisticas):
     img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
 
     return img_base64
+
 
 
 
@@ -140,6 +161,7 @@ def completar_jugador(jugador):
             profile_data = response_profile.json()
             jugador.set_pais(profile_data.get("citizenship"))
             jugador.edad = profile_data.get("age")
+            jugador.imagen = profile_data.get("imageURL")
         else:
             print(f"No se pudo obtener el perfil del jugador {jugador_id}")
 

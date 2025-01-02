@@ -28,6 +28,13 @@ clubes = {
     0: {"nombre": "Granada CF", "codigo": "16795", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlMlV11fmBvnB7UA6QKpLV7XqT8TpiDjq0fg&s"},
     1: {"nombre": "Real Madrid", "codigo": "418", "logo": "https://estaticos-cdn.prensaiberica.es/clip/c8717efc-31eb-48fb-b01b-bdd1a43dfde1_alta-libre-aspect-ratio_default_0.jpg"},
     2: {"nombre": "FC Barcelona", "codigo": "131", "logo": "https://logowik.com/content/uploads/images/802_fcbarcelona.jpg"},
+    3: {"nombre": "Liverpool FC", "codigo": "31", "logo": "https://www.goodvinilos.com/111535/vinilo-de-pared-escudo-liverpool.jpg"},
+    4: {"nombre": "ACF Fiorentina", "codigo": "430", "logo": "https://www.teleadhesivo.com/es/img/esci010-jpg/folder/products-listado-merchanthover/vinilos-decorativos-escudo-acf-fiorentina.jpg"},
+    5: {"nombre": "Manchester United", "codigo": "985", "logo": "https://www.goodvinilos.com/111550/vinilo-decorativo-escudo-del-manchester-united.jpg"},
+    6: {"nombre": "Manchester City", "codigo": "281", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ00CQEdgDX2xKPmWH0Ml9K_UKRL2p0z6k-vQ&s"},
+    7: {"nombre": "Bayern Munich FC", "codigo": "27", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTN2FqHqhND9TiDHknplE26nteg1j5bOnSvpA&s"},
+    8: {"nombre": "Borussia Dortmund", "codigo": "16", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-_81SnKhCGXDdmYl0N0nlrJ_GHAabwKDMFw&s"},
+    9: {"nombre": "SSV Jahn Regensburg", "codigo": "109", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBE6F2WYgVOn4C5ICHQ_75F9DFsH5AJMY03A&s"}
 }
 
 # Lista global para almacenar jugadores
@@ -168,7 +175,8 @@ def perfil_jugador(jugador_id):
     jugador_encontrado.imagen_base64 = imagen_base64  # Agregar la imagen codificada en base64
 
     # Renderizar la plantilla y pasar la imagen
-    return render_template('profile.html', jugador=jugador_encontrado, imagen_base64=imagen_base64)
+    return render_template('profile.html', jugador=jugador_encontrado, imagen_base64=imagen_base64, jugador_imagen=jugador_encontrado.get_imagen())
+
 
 
 

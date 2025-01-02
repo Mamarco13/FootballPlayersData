@@ -19,7 +19,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
-        h1 {
+        h1, h2 {
             text-align: center;
             color: #333;
         }
@@ -34,15 +34,35 @@
         ul li {
             list-style-type: disc;
         }
-        img {
+        .player-image {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .section-title {
+            text-align: center;
+        }
+        img.graph {
+            display: block;
             max-width: 100%;
             height: auto;
+            margin: 20px 0;
+        }
+        a {
+            display: block;
+            text-align: center;
+            color: #28a745;
+            text-decoration: none;
             margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="{{ jugador.get_imagen() }}" alt="Player Image" class="player-image">
         <h1>{{ jugador.get_nombre() }}</h1>
         <p><strong>Position:</strong> {{ jugador.get_posicion() }}</p>
         <p><strong>Age:</strong> {{ jugador.get_edad() }}</p>
@@ -52,11 +72,10 @@
             No nationality specified.
             {% endif %}
         </p>
-        
         <p><strong>Market Value:</strong> {{ jugador.get_valor_mercado() }}€</p>
         <p><strong>Current Team:</strong> {{ jugador.get_equipo_actual() }}</p>
         
-        <h2>Achievements</h2>
+        <h2 class="section-title">Achievements</h2>
         <ul>
             {% if jugador.get_logros() %}
                 {% for logro in jugador.get_logros() %}
@@ -67,7 +86,7 @@
             {% endif %}
         </ul>
 
-        <h2>Statistics</h2>
+        <h2 class="section-title">Statistics</h2>
         <ul>
             {% if jugador.get_estadisticas() %}
                 {% for stat, value in jugador.get_estadisticas().items() %}
@@ -78,13 +97,12 @@
             {% endif %}
         </ul>
 
-        <!-- Mostrar el gráfico generado (si existe) -->
         {% if imagen_base64 %}
-            <h3>Player Statistics Graph</h3>
-            <img src="data:image/png;base64,{{ imagen_base64 }}" alt="Statistics Graph">
+            <h3 class="section-title">Player Statistics Graph</h3>
+            <img src="data:image/png;base64,{{ imagen_base64 }}" alt="Statistics Graph" class="graph">
         {% endif %}
 
-        <a href="/" style="color: #28a745; text-decoration: none;">Back to Home</a>
+        <a href="/">Back to Home</a>
     </div>
 </body>
 </html>

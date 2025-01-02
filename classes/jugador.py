@@ -58,6 +58,10 @@ class Jugador:
     def get_estadisticas(self):
         """Devuelve el diccionario de estadísticas del jugador."""
         return self.estadisticas
+    
+    def get_imagen(self):
+        """Devuelve la URL de la imagen del jugador."""
+        return self.imagen
         
 
     def __str__(self):
