@@ -200,7 +200,7 @@ def seleccion_club():
                     club_objeto = club_info  # Asegúrate de tener toda la información del club
 
                     # Obtener los jugadores de este club
-                    jugadores = obtener_jugadores_por_club(club_objeto['codigo'])
+                    jugadores = obtener_jugadores_por_club_simple(club_objeto['codigo'])
 
                     for jugador in jugadores:
                         jugador.set_team_name(club_objeto['nombre'])
