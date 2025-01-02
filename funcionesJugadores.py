@@ -1,12 +1,14 @@
 import requests
-
 import io
 import base64
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import matplotlib
+#matplotlib.use('Agg')  # Usar un backend no interactivo para evitar errores de GUI
+import matplotlib.ticker as mticker
 
 def mostrar_estadisticas_grafico(estadisticas):
+    # Validar el formato de entrada
     if isinstance(estadisticas, list):
         stats = estadisticas
     elif isinstance(estadisticas, dict):
@@ -22,6 +24,7 @@ def mostrar_estadisticas_grafico(estadisticas):
     # Convertir a DataFrame
     df = pd.DataFrame(stats)
 
+    # Verificar columnas requeridas
     required_columns = {'competitionName', 'seasonID', 'goals', 'assists', 'appearances', 'minutesPlayed'}
     if not required_columns.issubset(df.columns):
         print("Faltan datos necesarios para generar el gráfico.")
@@ -31,7 +34,8 @@ def mostrar_estadisticas_grafico(estadisticas):
     df['goals'] = pd.to_numeric(df['goals'], errors='coerce').fillna(0).astype(int)
     df['assists'] = pd.to_numeric(df['assists'], errors='coerce').fillna(0).astype(int)
     df['appearances'] = pd.to_numeric(df['appearances'], errors='coerce').fillna(0).astype(int)
-    df['minutesPlayed'] = pd.to_numeric(df['minutesPlayed'], errors='coerce').fillna(0).astype(int)
+    # Corregir los minutos jugados multiplicando por 1000 si están en formato decimal
+    df['minutesPlayed'] = pd.to_numeric(df['minutesPlayed'].replace({r"[^\d.]": ""}, regex=True), errors='coerce').fillna(0).apply(lambda x: x * 1000 if x < 10 else x).astype(int)
     df['competitionName'] = df['competitionName'].astype(str)
     df['seasonID'] = df['seasonID'].astype(str)
 
@@ -43,37 +47,43 @@ def mostrar_estadisticas_grafico(estadisticas):
         print("No hay estadísticas para las últimas dos temporadas.")
         return None
 
-    # Crear gráficos
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-
-    # Etiquetas combinadas
+    # Crear columna combinada para etiquetas
     df['competition_season'] = df['competitionName'] + " (" + df['seasonID'] + ")"
 
+    # Crear gráficos con Pandas
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
     # Gráfico de Goles
-    axes[0, 0].bar(df['competition_season'], df['goals'], color='skyblue')
+    df.plot.bar(x='competition_season', y='goals', color='skyblue', ax=axes[0, 0], legend=False)
     axes[0, 0].set_title('Goals - Last 2 Seasons')
     axes[0, 0].set_ylabel('Goals')
-    axes[0, 0].tick_params(axis='x', rotation=45, labelsize=10)
 
     # Gráfico de Asistencias
-    axes[0, 1].bar(df['competition_season'], df['assists'], color='lightgreen')
+    df.plot.bar(x='competition_season', y='assists', color='lightgreen', ax=axes[0, 1], legend=False)
     axes[0, 1].set_title('Assists - Last 2 Seasons')
     axes[0, 1].set_ylabel('Assists')
-    axes[0, 1].tick_params(axis='x', rotation=45, labelsize=10)
 
     # Gráfico de Apariciones
-    axes[1, 0].bar(df['competition_season'], df['appearances'], color='coral')
+    df.plot.bar(x='competition_season', y='appearances', color='coral', ax=axes[1, 0], legend=False)
     axes[1, 0].set_title('Appearances - Last 2 Seasons')
     axes[1, 0].set_ylabel('Appearances')
-    axes[1, 0].tick_params(axis='x', rotation=45, labelsize=10)
 
     # Gráfico de Minutos Jugados
-    axes[1, 1].bar(df['competition_season'], df['minutesPlayed'], color='lightcoral')
+    df.plot.bar(x='competition_season', y='minutesPlayed', color='lightcoral', ax=axes[1, 1], legend=False)
     axes[1, 1].set_title('Minutes Played - Last 2 Seasons')
     axes[1, 1].set_ylabel('Minutes Played')
-    axes[1, 1].tick_params(axis='x', rotation=45, labelsize=10)
 
-    # Ajustar espacio entre gráficos
+    # Ajustar el límite superior del eje Y para minutos jugados
+    ylim_upper = df['minutesPlayed'].max() * 1.2
+    axes[1, 1].set_ylim(0, ylim_upper)
+
+    # Formatear etiquetas del eje Y para minutos jugados
+    axes[1, 1].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
+
+    # Ajustar diseño y guardar el gráfico
+    for ax in axes.flatten():
+        ax.tick_params(axis='x', rotation=45, labelsize=10)
+
     plt.tight_layout()
 
     # Guardar el gráfico en memoria como PNG
@@ -83,8 +93,9 @@ def mostrar_estadisticas_grafico(estadisticas):
 
     img_stream.seek(0)
     img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
-    
+
     return img_base64
+
 
 
 
@@ -127,7 +138,7 @@ def completar_jugador(jugador):
         response_profile = requests.get(profile_url)
         if response_profile.status_code == 200:
             profile_data = response_profile.json()
-            jugador.nacionalidad = profile_data.get("nationality")
+            jugador.set_pais(profile_data.get("citizenship"))
             jugador.edad = profile_data.get("age")
         else:
             print(f"No se pudo obtener el perfil del jugador {jugador_id}")

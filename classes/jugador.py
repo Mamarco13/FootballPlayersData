@@ -18,6 +18,9 @@ class Jugador:
 
     def set_team_name(self, team_name):
         self.equipo_actual = team_name
+    
+    def set_pais(self, pais):
+        self.nacionalidad = pais
 
     # Getters
     def get_id(self):
