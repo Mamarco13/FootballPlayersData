@@ -12,7 +12,6 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)
 # Iniciar el servidor de la API usando poetry run
 poetry run python app/main.py &
 
-# Abrir la página local de la API en el navegador predeterminado
-open http://localhost:8000/
+
 
 
