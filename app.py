@@ -112,7 +112,7 @@ def perfil_jugador(jugador_id):
             break
 
     if jugador_encontrado is None:
-        return render_template('error.html', mensaje="Jugador no encontrado"), 404
+        return render_template('error.html', mensaje="Player not found"), 404
 
     # Procesar logros
     logros_procesados = []
