@@ -18,15 +18,24 @@ Once you have the necessary permissions, simply execute the following command in
 ```
 
 > [!CAUTION] 
-> Ensure that all required modules are installed. The required modules are **pandas**, **matplotlib**, and **flask**.
+> Ensure that all required modules are installed. The required modules are **pandas**, **matplotlib**, **poetry** and **flask**.
 
-To install the modules, execute the following commands in the terminal:
+To install the first modules, execute the following commands in the terminal:
 
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip
 pip3 install flask pandas matplotlib
 ```
+To install poetry is a bit more difficult:
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+export PATH="$HOME/.local/bin:$PATH"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+If your Internet connection is not so good, the installation may fail at first, but in a second try it will work perfectly.
 
 ## Using the Application
 
