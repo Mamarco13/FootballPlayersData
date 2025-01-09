@@ -10,4 +10,4 @@ poetry install --no-root
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 # Iniciar el servidor de la API usando poetry run, forzando el puerto 8000
-poetry run python app/main.py --port 8000 &
+poetry run python app/main.py --port 8000 & 
