@@ -1,4 +1,4 @@
-# Proyecto_KDSP
+# FootballPlayersData
 
 ## Launching the Program
 
@@ -75,5 +75,5 @@ If something goes wrong during execution, an error page like this will be displa
 
 ---
 
-With this guide, you can set up, run, and explore the **Proyecto_KDSP** application. If you encounter any issues or have questions, feel free to seek additional help.
+With this guide, you can set up, run, and explore the **FootballPlayersData** application. If you encounter any issues or have questions, feel free to seek additional help.
 
