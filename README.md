@@ -1,33 +1,57 @@
-# FootballPlayersData
+# ⚽ FootballPlayersData
 
-## Launching the Program
+**FootballPlayersData** is a Python-based application that lets you search, explore, and analyze live-updated player market values from **Transfermarkt**.
+It provides an interactive web interface powered by **Flask**, with data processing and visualization handled through **pandas** and **matplotlib**.
 
-To start the project, you need to execute the `init.sh` file.
+---
 
-> [!WARNING] 
-> The `init.sh` file has been modified to allow anyone to execute it. If it doesn't work, you can grant execution permissions using the following command:
->
-> ```bash
-> sudo chmod +x init.sh
-> ```
+## 🚀 Getting Started
 
-Once you have the necessary permissions, simply execute the following command in the terminal:
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Mamarco13/FootballPlayersData.git
+cd FootballPlayersData
+```
+
+### 2. Grant execution permissions
+
+> ⚠️ **Note**  
+> The `init.sh` script has been modified to allow execution by default.  
+> If you still encounter permission issues, run:
+
+```bash
+sudo chmod +x init.sh
+```
+
+### 3. Run the initialization script
 
 ```bash
 ./init.sh
 ```
 
-> [!CAUTION] 
-> Ensure that all required modules are installed. The required modules are **pandas**, **matplotlib**, **poetry** and **flask**.
+This will automatically start the application and launch the local web interface.
 
-To install the first modules, execute the following commands in the terminal:
+---
+
+## ⚙️ Requirements
+
+Ensure that the following modules are installed:
+
+- **pandas**
+- **matplotlib**
+- **flask**
+- **poetry**
+
+You can install them manually as follows:
 
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip
 pip3 install flask pandas matplotlib
 ```
-To install poetry is a bit more difficult:
+
+To install **Poetry**, run:
 
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
@@ -35,45 +59,58 @@ export PATH="$HOME/.local/bin:$PATH"
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
-If your Internet connection is not so good, the installation may fail at first, but in a second try it will work perfectly.
 
-## Using the Application
-
-Once you have started the application, you will see a screen similar to this:
-
-![Main screen capture](/RM_Screenshots/mainscreen.png)
-
-### Selecting Leagues
-
-If you select "Leagues," a screen like this will appear. You can choose as many leagues as you want and set the number of players to display:
-
-![League selection capture](/RM_Screenshots/leagues.png)
-
-### Selecting Clubs
-
-If you select "Clubs," a screen like this will appear. You can choose as many clubs as you want and define the number of players to display (maximum 20):
-
-![Club selection capture](/RM_Screenshots/clubs.png)
-
-### Viewing Results
-
-Regardless of the option you choose, you will access a template where only the displayed information changes. Here, you can see the selected number of players ordered by their market value. You will also have the option to access their profiles to get more detailed information.
-
-![Players list capture](/RM_Screenshots/players.png)
-
-### Profile Page
-
-The profile page of a player will look like this:
-
-![Profile capture](/RM_Screenshots/profile.png)
-
-### Error Page
-
-If something goes wrong during execution, an error page like this will be displayed:
-
-![Error capture](/RM_Screenshots/error.png)
+> 💡 If the installation fails due to a weak internet connection, try running the command again — it usually works on the second attempt.
 
 ---
 
-With this guide, you can set up, run, and explore the **FootballPlayersData** application. If you encounter any issues or have questions, feel free to seek additional help.
+## 🧠 Using the Application
 
+Once launched, you’ll see the main interface:
+
+![Main screen](/RM_Screenshots/mainscreen.png)
+
+### 🏆 Selecting Leagues
+
+Click on **Leagues** to filter players by their respective leagues.  
+You can select multiple leagues and specify how many top players to display:
+
+![Leagues selection](/RM_Screenshots/leagues.png)
+
+### 🏟️ Selecting Clubs
+
+Click on **Clubs** to explore data by team.  
+You can select multiple clubs and define the number of players shown (up to 20):
+
+![Clubs selection](/RM_Screenshots/clubs.png)
+
+### 📊 Viewing Results
+
+Regardless of your selection, you’ll reach a dynamic results page showing players sorted by **market value**.  
+From there, you can access each player’s profile for detailed information.
+
+![Players list](/RM_Screenshots/players.png)
+
+### 🧍 Player Profile Page
+
+Each player profile includes comprehensive stats and market insights:
+
+![Profile page](/RM_Screenshots/profile.png)
+
+### ❌ Error Page
+
+If something goes wrong, a custom error page will be displayed to help you debug:
+
+![Error page](/RM_Screenshots/error.png)
+
+---
+
+## 📚 Summary
+
+With this guide, you can easily **set up, run, and explore** the FootballPlayersData application.  
+If you encounter any issues or have questions, feel free to open an issue on GitHub.
+
+---
+
+**Developed by [Mamarco13](https://github.com/Mamarco13)**  
+_“Turning football data into knowledge.”_
